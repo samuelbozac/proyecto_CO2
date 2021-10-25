@@ -4,6 +4,7 @@ from datetime import datetime as dt, timedelta
 from servo import ServoMotor
 # NOTE En prueba las dos ultimas clases a ver cual es más eficiente.
 from rpi_lcd import LCD
+from puentes_h import Puente_h
 import mh_Z19
 import psycopg2
 import pandas as pd
@@ -11,6 +12,8 @@ import time
 import smtplib
 import sys, os 
 
+puente_1 = Puente_h(pin1 = 32, pin2 = 33)
+puente_2 = Puente_h(pin1 = 34, pin2 = 35)
 lcd = LCD()
 servo = Servo(25)
 reading = True
@@ -26,8 +29,8 @@ def send_report_email(message):
         :rtype: bool
         """
     print('Enviando email...')
-    email = os.getenv('EMAIL')
-    password = os.getenv('EMAIL_PASSWORD')
+    email = "TEG.usuarioCO2@gmail.com"
+    password = "alertaCO2"
     destinatary = os.environ.get('USER_EMAIL')
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -46,13 +49,14 @@ if __name__ == '__main__':
         time_moment = dt.now()
         try:
             resp = mh_z19.read_all()
-            co2 = resp.get('co2')
+            co2 = float(resp.get('co2'))
             print(f'Niveles de CO2: {co2}')
             lcd.text(f"CO2: {co2}", 1)
             if co2 >= 800:
                 print('Por encima del limite recomendado.\nIniciando proceso de ventilación')
                 # Open doors and windows
                 servo.max()
+                # Activate "H-Bridge"
                 opened = True
                 subject = "¡ALERTA!"
                 message = f'El nivel de concentración de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
@@ -65,7 +69,7 @@ del {time_moment.strftime("%d/%m/%y")} es de {co2}ppm, superando los 800ppm reco
 {time_moment.strftime("%I:%M%p")} del {time_moment.strftime("%d/%m/%y")}. Tomar precauciones!'
                 message = f'Subject: {subject}\n\n{message}'
                 send_report_email(message)  
-            elif (co2 < 800) and opened:
+            elif (co2 < 550) and opened:
                 # Close doors and windows
                 servo.min()
                 opened = False
