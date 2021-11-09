@@ -15,7 +15,7 @@ class Transistor():
         if(output == "HIGH"):
             GPIO.output(self.pin, GPIO.HIGH)
 
-        if(output == "LOW"):
+        elif(output == "LOW"):
             GPIO.output(self.pin, GPIO.LOW)
 
 class Puente_h():
@@ -32,4 +32,11 @@ class Puente_h():
         self.high_opener
         time.sleep(timeout)
         self.low_opener
+        return True
+
+    def close(self, timeout):
+        """Function to close the doors"""
+        self.high_closer
+        time.sleep(timeout)
+        self.low_closer
         return True

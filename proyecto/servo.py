@@ -1,6 +1,5 @@
 from time import sleep
 import RPi.GPIO as GPIO
-import helpers.commands as commands
 import sys
 
 

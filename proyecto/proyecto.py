@@ -2,19 +2,20 @@ from signal import signal, SIGTERM, SIGHUP, pause
 from gpiozero import Servo
 from datetime import datetime as dt, timedelta
 from servo import ServoMotor
+import json
 # NOTE En prueba las dos ultimas clases a ver cual es más eficiente.
 from rpi_lcd import LCD
-from puentes_h import Puente_h
-import mh_Z19
+from bridges_h import bridge_h
+import mh_z19
 import psycopg2
 import pandas as pd
 import time
 import smtplib
-import sys, os 
+import sys, os
 
-puente_1 = Puente_h(pin1 = 32, pin2 = 33)
-puente_2 = Puente_h(pin1 = 34, pin2 = 35)
-lcd = LCD()
+bridge_1 = bridge_h(pin1 = 32, pin2 = 33)
+bridge_2 = bridge_h(pin1 = 34, pin2 = 35)
+lcd = LCD() # Configurate LCD address before execute
 servo = Servo(25)
 reading = True
 opened = False
@@ -42,7 +43,7 @@ def send_report_email(message):
     server.quit()
     print('Email enviado.')
     return True
-
+    
 if __name__ == '__main__':
     print('Iniciando lectura')
     while reading:
@@ -50,6 +51,7 @@ if __name__ == '__main__':
         try:
             resp = mh_z19.read_all()
             co2 = float(resp.get('co2'))
+            resp.update({"datetime":time_moment.timestamp()})
             print(f'Niveles de CO2: {co2}')
             lcd.text(f"CO2: {co2}", 1)
             if co2 >= 800:
@@ -57,6 +59,8 @@ if __name__ == '__main__':
                 # Open doors and windows
                 servo.max()
                 # Activate "H-Bridge"
+                bridge_1.opens()
+                bridge_2.opens()
                 opened = True
                 subject = "¡ALERTA!"
                 message = f'El nivel de concentración de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
@@ -77,6 +81,20 @@ del {time_moment.strftime("%d/%m/%y")} es de {co2}ppm, superando los 800ppm reco
                 message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilación preventiva del área se apagará.'
                 message = f'Subject: {subject}\n\n{message}'
                 send_report_email(message)
+            if not os.path.exists('data.txt'):
+                with open('data.txt', 'w') as file:
+                    json_data = json.dumps([resp])
+                    file.write(json_data)
+                    file.close()
+            else:
+                with open('data.txt', 'r') as file:
+                    txt_last_data = file.read()
+                    last_data = json.loads(txt_last_data)
+                data = last_data.append(resp)
+                with open('data.txt', 'w') as file:
+                    json_data = json.dumps(data)
+                    file.write(json_data)
+                    file.close()
             time.sleep(1)
         except KeyboardInterrupt:
             reading = False
