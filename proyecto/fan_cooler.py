@@ -1,18 +1,15 @@
 from time import sleep
-import RPi.GPIO as GPIO
+import gpiozero
 
 class FanCooler():
-    GPIO.setmode(GPIO.BOARD)
     
-    def __init__(self, pin):
-        self.pin = pin
-
-    def activate(self):
-        assert self.pin is not None
-        GPIO.setup(self.pin, GPIO.OUT)
-        GPIO.output(self.pin, GPIO.HIGH)
+    def __init__(self, relay_pin):
+        self.relay = gpiozero.OutputDevice(relay_pin, active_high=True, initial_value=False)
     
     def desactivate(self):
-        assert self.pin is not None
-        GPIO.setup(self.pin, GPIO.OUT)
-        GPIO.output(self.pin, GPIO.LOW)
+        self.relay.off() # switch off
+    
+    def activate(self):
+        self.relay.on() # switch on
+
+    

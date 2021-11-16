@@ -1,21 +1,20 @@
 from signal import signal, SIGTERM, SIGHUP, pause
 from gpiozero import Servo
 from datetime import datetime as dt, timedelta
-from servo import ServoMotor
 import json
-# NOTE En prueba las dos ultimas clases a ver cual es más eficiente.
-from rpi_lcd import LCD
+from fan_cooler import FanCooler
+from lcd import lcd
 from bridges_h import bridge_h
 import mh_z19
-import psycopg2
 import pandas as pd
 import time
 import smtplib
 import sys, os
 
+fan = FanCooler(21)
 bridge_1 = bridge_h(pin1 = 32, pin2 = 33)
 bridge_2 = bridge_h(pin1 = 34, pin2 = 35)
-lcd = LCD() # Configurate LCD address before execute
+lcd2 = lcd() # Configurate LCD2 address before execute
 servo = Servo(25)
 reading = True
 opened = False
@@ -53,7 +52,7 @@ if __name__ == '__main__':
             co2 = float(resp.get('co2'))
             resp.update({"datetime":time_moment.timestamp()})
             print(f'Niveles de CO2: {co2}')
-            lcd.text(f"CO2: {co2}", 1)
+            lcd2.message(f"CO2: {co2}", 1)
             if co2 >= 800:
                 print('Por encima del limite recomendado.\nIniciando proceso de ventilación')
                 # Open doors and windows
@@ -61,6 +60,7 @@ if __name__ == '__main__':
                 # Activate "H-Bridge"
                 bridge_1.opens()
                 bridge_2.opens()
+                fan.activate()
                 opened = True
                 subject = "¡ALERTA!"
                 message = f'El nivel de concentración de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
@@ -76,6 +76,9 @@ del {time_moment.strftime("%d/%m/%y")} es de {co2}ppm, superando los 800ppm reco
             elif (co2 < 550) and opened:
                 # Close doors and windows
                 servo.min()
+                bridge_1.close()
+                bridge_2.close()
+                fan.desactivate()
                 opened = False
                 subject = f'Nivel de CO2 estable'
                 message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilación preventiva del área se apagará.'
@@ -99,4 +102,4 @@ del {time_moment.strftime("%d/%m/%y")} es de {co2}ppm, superando los 800ppm reco
         except KeyboardInterrupt:
             reading = False
         finally:
-            lcd.clear()
+            lcd2.clear()
