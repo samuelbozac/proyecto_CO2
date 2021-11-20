@@ -58,16 +58,16 @@ if __name__ == '__main__':
             doors.opening(timeout = 0.07)
             opened = True
             display.message("Ventilando...")
-            subject = "¡ALERTA!"
-            message = f'El nivel de concentración de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
-del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 800ppm recomendados. Se iniciará la ventilación preventiva del área.'
+            subject = "ALERTA!"
+            message = f'El nivel de concentracion de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
+del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 800ppm recomendados. Se iniciará la ventilacion preventiva del area.'
             message = f"Subject: {subject}\n\n{message}"
             send_report_email(message)
         elif (concentration < 500) and opened:
             close_all()
             opened = False
             subject = f'Nivel de CO2 estable'
-            message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilación preventiva del área se apagará.'
+            message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilacion preventiva del area se apagara.'
             message = f'Subject: {subject}\n\n{message}'
             send_report_email(message)
         else:
