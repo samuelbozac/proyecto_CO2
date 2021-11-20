@@ -3,6 +3,9 @@ from lcd import lcd
 import time
 from fan_cooler import FanCooler
 from gpiozero import Servo
+import smtplib
+import os
+from datetime import datetime as dt
 
 def open_all(servo,fan,doors):
     servo.max()
@@ -14,6 +17,30 @@ def close_all(servo,fan,doors):
     fan.desactivate()
     doors.closing(timeout = 0.07)
 
+def send_report_email(message):
+    """Function to send the report of an action to the user
+    
+        :param message: Message to send
+        :type message: str
+        
+        :return: Boolean if the message was sent.
+        :rtype: bool
+        """
+    print('Enviando email...')
+    email = "TEG.usuarioCO2@gmail.com"
+    password = "alertaCO2"
+    destinatary = os.environ.get('USER_EMAIL')
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(email, password)
+
+    server.sendmail(email, destinatary, message)
+
+    server.quit()
+    print('Email enviado.')
+    return True
+
 if __name__ == '__main__':
     concentration = 415
     opened = False
@@ -24,13 +51,24 @@ if __name__ == '__main__':
     while True:
         time.sleep(1)
         display.clear()
+        time_moment = dt.now()
         if (concentration > 800) and (opened == False):
             open_all(servo,fan,doors)
             opened = True
             display.message("Ventilando...")
+            subject = "¡ALERTA!"
+            message = f'El nivel de concentración de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
+del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 800ppm recomendados. Se iniciará la ventilación preventiva del área.'
+            message = f"Subject: {subject}\n\n{message}"
+            send_report_email(message)
+        
         elif (concentration < 500) and opened:
             close_all()
             opened = False
+            subject = f'Nivel de CO2 estable'
+            message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilación preventiva del área se apagará.'
+            message = f'Subject: {subject}\n\n{message}'
+            send_report_email(message)
         else:
             display.message(f"CO2: {concentration}")
             if opened:
