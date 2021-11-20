@@ -54,13 +54,15 @@ if __name__ == '__main__':
         time_moment = dt.now()
         if (concentration > 800) and (opened == False):
             servo.max()
+            time.sleep(1)
             fan.activate()
+            time.sleep(1)
             doors.opening(timeout = 0.07)
             opened = True
             display.message("Ventilando...")
             subject = "ALERTA!"
             message = f'El nivel de concentracion de CO2 en el ambiente a las {time_moment.strftime("%I:%M%p")} \
-del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 800ppm recomendados. Se iniciará la ventilacion preventiva del area.'
+del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 800ppm recomendados. Se iniciara la ventilacion preventiva del area.'
             message = f"Subject: {subject}\n\n{message}"
             send_report_email(message)
         elif (concentration < 500) and opened:
