@@ -19,25 +19,21 @@ import gpiozero
 #         elif(output == "LOW"):
 #             GPIO.output(self.pin, GPIO.LOW)
 
-class H_Bridges():
+class H_Bridge():
     def __init__(self, pin1, pin2):
         self.opener = gpiozero.OutputDevice(pin1, active_high=True, initial_value=False)
-        self.opener = gpiozero.OutputDevice(pin1, active_high=True, initial_value=False)
-        self.high_opener = self.opener.on()
-        self.low_opener = self.opener.off()
-        self.high_closer = self.closer.on()
-        self.low_closer = self.closer.off()
+        self.closer = gpiozero.OutputDevice(pin2, active_high=True, initial_value=False)
 
-    def opens(self, timeout = 3):
+    def opens(self, timeout = 0.1):
         """Function to open the door"""
-        self.high_opener
+        self.opener.on()
         time.sleep(timeout)
-        self.low_opener
+        self.opener.off()
         return True
 
-    def close(self, timeout):
+    def close(self, timeout = 0.1):
         """Function to close the doors"""
-        self.high_closer
+        self.closer.on()
         time.sleep(timeout)
-        self.low_closer
+        self.closer.off()
         return True

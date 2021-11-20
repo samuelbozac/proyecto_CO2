@@ -1,0 +1,32 @@
+from time import sleep
+import RPi.GPIO as GPIO
+
+class FanCooler():
+    
+    def __init__(self, pin):
+        self.pin = pin
+        print(self.pin)
+    def activate(self):
+        assert self.pin is not None
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, GPIO.HIGH)
+    
+    def desactivate(self):
+        assert self.pin is not None
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, GPIO.LOW)
+
+if __name__ == "__main__":
+        fan = FanCooler(25)
+        print("Intentando conexión")
+        fan.activate()
+        print("Äctivando..")
+        sleep(15)
+        fan.desactivate()
+        print("Desactivando")
+     except:
+        print("Ocurrio un error")
+     finally:
+        GPIO.cleanup()
