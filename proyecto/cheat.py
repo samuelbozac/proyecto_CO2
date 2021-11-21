@@ -42,6 +42,7 @@ def send_report_email(message):
     return True
 
 if __name__ == '__main__':
+    process = 0
     concentration = 415
     opened = False
     display = lcd()
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     servo = Servo(2)
     # display.message("CO2: 415 PPM")
     # time.sleep(30)
-    while True:
+    while process == 0:
         time.sleep(1)
         display.clear()
         time_moment = dt.now()
@@ -74,6 +75,7 @@ del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 8
             message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilacion preventiva del area se apagara.'
             message = f'Subject: {subject}\n\n{message}'
             send_report_email(message)
+            process +=1
         else:
             display.message(f"CO2: {concentration}")
             if opened:
