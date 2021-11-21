@@ -48,6 +48,8 @@ if __name__ == '__main__':
     doors = Doors(6,13,26,19)
     fan = FanCooler(21)
     servo = Servo(2)
+    # display.message("CO2: 415 PPM")
+    # time.sleep(30)
     while True:
         time.sleep(1)
         display.clear()
