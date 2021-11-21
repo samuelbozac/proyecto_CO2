@@ -50,17 +50,16 @@ if __name__ == '__main__':
     doors = Doors(6,13,26,19)
     fan = FanCooler(21)
     servo = Servo(2)
-    # display.message("CO2: 415 PPM")
-    # time.sleep(30)
+
     while process == 0:
-        data = {dt.now().timestamp:concentration}
-        with open("data.txt", "r") as file:
-            file_read = file.read()
-            data_dict = json.loads(file_read)
-        with open("data.txt", "w") as file_writer:
-            new_data = data_dict.update(data)
-            json_data = json.dumps(new_data)
-            file_writer.write(json_data)
+        # data = {dt.now().timestamp:concentration}
+        # with open("data.txt", "r") as file:
+        #     file_read = file.read()
+        #     data_dict = json.loads(file_read)
+        # with open("data.txt", "w") as file_writer:
+        #     new_data = data_dict.update(data)
+        #     json_data = json.dumps(new_data)
+        #     file_writer.write(json_data)
         time.sleep(1)
         display.clear()
         time_moment = dt.now()
