@@ -72,7 +72,7 @@ del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 8
             doors.closing(timeout = 0.07)
             opened = False
             subject = f'Nivel de CO2 estable'
-            message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilacion preventiva del area se apagara.'
+            message = f'El nivel de concentracion de CO2 se encuentra por debajo de 800ppm. El sistema de ventilacion preventiva del area se apagara.'
             message = f'Subject: {subject}\n\n{message}'
             send_report_email(message)
             process +=1
