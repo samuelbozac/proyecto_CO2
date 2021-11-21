@@ -4,9 +4,9 @@ import time
 from fan_cooler import FanCooler
 from gpiozero import Servo
 import smtplib
-import os
 from datetime import datetime as dt
 from numpy.random import randint
+import json
 
 def open_all(servo,fan,doors):
     servo.max()
@@ -53,6 +53,14 @@ if __name__ == '__main__':
     # display.message("CO2: 415 PPM")
     # time.sleep(30)
     while process == 0:
+        data = {dt.now().timestamp:concentration}
+        with open("data.txt", "r") as file:
+            file_read = file.read()
+            data_dict = json.loads(file_read)
+        with open("data.txt", "w") as file_writer:
+            new_data = data_dict.update(data)
+            json_data = json.dumps(new_data)
+            file_writer.write(json_data)
         time.sleep(1)
         display.clear()
         time_moment = dt.now()
