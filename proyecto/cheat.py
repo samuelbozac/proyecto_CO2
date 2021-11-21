@@ -6,6 +6,7 @@ from gpiozero import Servo
 import smtplib
 import os
 from datetime import datetime as dt
+from numpy.random import randint
 
 def open_all(servo,fan,doors):
     servo.max()
@@ -77,8 +78,16 @@ del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 8
             send_report_email(message)
             process +=1
         else:
-            display.message(f"CO2: {concentration}")
+            display.message(f"CO2: {concentration} PPM")
             if opened:
                 concentration -= 9
             else:
                 concentration += 47
+    while True:
+        display.clear()
+        display.message(f"CO2: {concentration} PPM")
+        time.sleep(10)
+        if concentration % 2 == 0:
+            concentration += randint(low=0, high=9)
+        else:
+            concentration -= randint(low=0, high=9)
