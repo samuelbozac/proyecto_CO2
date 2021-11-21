@@ -29,7 +29,7 @@ def send_report_email(message):
     print('Enviando email...')
     email = "TEG.usuarioCO2@gmail.com"
     password = "alertaCO2."
-    destinatary = os.environ.get('USER_EMAIL')
+    destinatary = "fcmloaiza@gmail.com"
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
@@ -54,9 +54,7 @@ if __name__ == '__main__':
         time_moment = dt.now()
         if (concentration > 800) and (opened == False):
             servo.max()
-            time.sleep(1)
             fan.activate()
-            time.sleep(1)
             doors.opening(timeout = 0.07)
             opened = True
             display.message("Ventilando...")
@@ -66,7 +64,9 @@ del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 8
             message = f"Subject: {subject}\n\n{message}"
             send_report_email(message)
         elif (concentration < 500) and opened:
-            close_all()
+            servo.min()
+            fan.desactivate()
+            doors.closing(timeout = 0.07)
             opened = False
             subject = f'Nivel de CO2 estable'
             message = f'El nivel de concentración de CO2 se encuentra por debajo de 800ppm. El sistema de ventilacion preventiva del area se apagara.'
