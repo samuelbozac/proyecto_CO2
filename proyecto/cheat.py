@@ -44,7 +44,7 @@ def send_report_email(message):
 
 if __name__ == '__main__':
     process = 0
-    concentration = 415
+    concentration = 421
     opened = False
     display = lcd()
     doors = Doors(6,13,26,19)
@@ -52,14 +52,19 @@ if __name__ == '__main__':
     servo = Servo(2)
 
     while process == 0:
-        # data = {dt.now().timestamp:concentration}
-        # with open("data.txt", "r") as file:
-        #     file_read = file.read()
-        #     data_dict = json.loads(file_read)
-        # with open("data.txt", "w") as file_writer:
-        #     new_data = data_dict.update(data)
-        #     json_data = json.dumps(new_data)
-        #     file_writer.write(json_data)
+        actual_data = {f"{dt.now().timestamp()}" : concentration}
+        with open("data.txt", "r") as file:
+            file_read = file.read()
+            print(file_read)
+        data_dict = json.loads(str(file_read))
+        print(type(data_dict))
+        new_data = dict(data_dict,**actual_data)
+        json_data = json.dumps(new_data)
+        print(new_data)
+        print(json_data)
+        with open("data.txt", "w") as file_writer:
+             file_writer.write(json_data)
+             file_writer.close()
         time.sleep(1)
         display.clear()
         time_moment = dt.now()
@@ -74,6 +79,7 @@ if __name__ == '__main__':
 del {time_moment.strftime("%d/%m/%y")} es de {concentration}ppm, superando los 800ppm recomendados. Se iniciara la ventilacion preventiva del area.'
             message = f"Subject: {subject}\n\n{message}"
             send_report_email(message)
+            time.sleep(3)
         elif (concentration < 500) and opened:
             servo.min()
             fan.desactivate()
