@@ -7,6 +7,20 @@ import smtplib
 from datetime import datetime as dt
 from numpy.random import randint
 import json
+import pytz
+
+def hora_locacion(locacion):
+    """Función para dar hora actual de lugar en específico
+        :param locacion: Ciudad con el uso horario a pedir (America/Caracas)
+        :type locacion: str
+        
+        :return: Datetime con tzinfo requerido
+        :rtype: Datetime
+        """
+    tz = locacion
+    utcmoment_naive = dt.utcnow()
+    utcmoment = utcmoment_naive.replace(tzinfo=pytz.utc)
+    return utcmoment.astimezone(pytz.timezone(tz))
 
 def open_all(servo,fan,doors):
     servo.max()
@@ -52,7 +66,7 @@ if __name__ == '__main__':
     servo = Servo(2)
 
     while process == 0:
-        actual_data = {f"{dt.now().timestamp()}" : concentration}
+        actual_data = {f"{hora_locacion('America/Caracas').timestamp()}" : concentration}
         with open("data.txt", "r") as file:
             file_read = file.read()
             print(file_read)
@@ -67,7 +81,7 @@ if __name__ == '__main__':
              file_writer.close()
         time.sleep(1)
         display.clear()
-        time_moment = dt.now()
+        time_moment = hora_locacion("America/Caracas")
         if (concentration > 800) and (opened == False):
             servo.max()
             fan.activate()
